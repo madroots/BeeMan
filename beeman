@@ -1,0 +1,1071 @@
+#!/bin/bash
+
+#################################################################################################
+#                                                                                               #
+#                                        <VARIABLES>                                            #
+#                                                                                               #
+#################################################################################################
+# shellcheck disable=SC2059
+
+# SCRIPT WIDE
+SCRIPT_NAME='beesport_new'
+VERSION='1.3.1'
+
+# OS DETECTION
+        osCodename=$(grep -e "^UBUNTU_CODENAME=" /etc/os-release | cut -c17-)
+        pkgs=""
+
+        case $osCodename in
+                bionic)
+                        pkgs="ibus libegl1-mesa libgl1-mesa-glx libxcb-xinerama0 libxcb-xtest0"
+                        ;;
+                focal)
+                        pkgs="ibus libegl1-mesa libgl1-mesa-glx libxcb-xinerama0 libxcb-xtest0"
+                        ;;
+                groovy)
+                        pkgs="ibus libegl1-mesa libgl1-mesa-glx libxcb-xinerama0 libxcb-xtest0"
+                        ;;
+                hirsute)
+                        pkgs="ibus libegl1-mesa libgl1-mesa-glx libxcb-xinerama0 libxcb-xtest0"
+                        ;;
+                *)
+                        echo "Your operating system is unsupported. Stop script unless you run on Debian."; sleep 5
+                        ;;
+        esac
+
+# COMPATIBILITY VARIABLES
+OPT='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o LogLevel=ERROR'
+
+# COLORS
+RESET='\033[0m'
+YELLOW='\033[1;33m'
+CYAN='\e[36m'
+GRAY='\033[0;37m'
+WHITE='\033[1;37m'
+GRAY_R='\033[39m'
+WHITE_R='\033[39m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+BLUE='\e[34m'
+BOLD='\e[1m'
+BLINK='\033[5m'
+
+# temp functions
+
+ColorGreen(){
+        echo -ne "$GREEN$1$RESET"
+}
+ColorBlue(){
+        echo -ne "$BLUE$1$RESET"
+}
+
+ANY_KEY() {
+read -rsn1 -p"# Press any key to exit";echo
+clear
+}
+
+ANY_KEY_2() {
+read -rsn1 -p"# Server restart is required. Press any key to restart..";echo
+clear
+}
+
+#################################################################################################
+#												#
+#					 <FUNCTIONS>					        #
+#												#
+#################################################################################################
+
+# LOADER
+LOADER() {
+echo -e "${YELLOW}#${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}###${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}####${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#####${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}######${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#######${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}########${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#########${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##########${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}###########${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}############${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#############${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##############${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}###############${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}###################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}####################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#####################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}######################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#######################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}########################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#########################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##########################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}###########################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}############################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#############################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##############################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}###############################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}################################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}#################################${RESET}"
+sleep 0.01; clear
+echo -e "${YELLOW}##################################${RESET}"
+}
+# HEADERS
+header_green() {
+  clear
+  clear
+  echo -e "${GREEN}###############################################################################${RESET}\\n"
+  echo
+}
+
+header_red() {
+  clear
+  clear
+  echo -e "${RED}###############################################################################${RESET}\\n"
+  echo
+}
+
+header_CYAN() {
+  clear
+  clear
+  echo -e "${CYAN}###############################################################################${RESET}\\n"
+  echo
+}
+
+header_call() {
+header_green
+cat << "EOF"
+888888b.                     .d8888b.                            888
+888  "88b                   d88P  Y88b                           888
+888  .88P                   Y88b.                                888
+8888888K.   .d88b.   .d88b.  "Y888b.   88888b.   .d88b.  888d888 888888
+888  "Y88b d8P  Y8b d8P  Y8b    "Y88b. 888 "88b d88""88b 888P"   888
+888    888 88888888 88888888      "888 888  888 888  888 888     888
+888   d88P Y8b.     Y8b.    Y88b  d88P 888 d88P Y88..88P 888     Y88b.
+8888888P"   "Y8888   "Y8888  "Y8888P"  88888P"   "Y88P"  888      "Y888
+                                       888
+                                       888
+                                       888
+                888     888               888          888
+                888     888               888          888
+                888     888               888          888
+                888     888 88888b.   .d88888  8888b.  888888 .d88b.  888d888
+                888     888 888 "88b d88" 888     "88b 888   d8P  Y8b 888P"
+                888     888 888  888 888  888 .d888888 888   88888888 888
+                Y88b. .d88P 888 d88P Y88b 888 888  888 Y88b. Y8b.     888
+                 "Y88888P"  88888P"   "Y88888 "Y888888  "Y888 "Y8888  888
+                            888
+                            888                             Help menu: -h
+                            888
+EOF
+echo
+sleep 0.6
+echo -e "${GREEN}######  This is BeeSport Updater v$VERSION  ######################################${RESET}"
+sleep 1
+echo
+echo
+}
+
+header_http() {
+clear
+printf "\e[1;92m    __    __  __                   __              __  \e[0m\n"
+printf "\e[1;92m   / /_  / /_/ /_____        _____/ /_  ___  _____/ /__\e[0m\n"
+printf "\e[1;92m  / __ \/ __/ __/ __ \______/ ___/ __ \/ _ \/ ___/ //_/\e[0m\n"
+printf "\e[1;92m / / / / /_/ /_/ /_/ /_____/ /__/ / / /  __/ /__/ ,<   \e[0m\n"
+printf "\e[1;92m/_/ /_/\__/\__/ .___/      \___/_/ /_/\___/\___/_/|_|  \e[0m\n"
+printf "\e[1;92m             /_/                  v1.2 made by Sim0n   \e[0m\n"
+}
+# END OF HEADERS
+
+# SYSTEM MESSAGES
+MSG_HDCCZECH() {
+echo
+echo -e "${RED}${BOLD}# hdcczech require upgrade with IIS war file!${RESET}"
+sleep 3
+echo
+read -n 1 -s -r -p "# Press ENTER if you wish to continue"
+}
+
+MSG_SUCCESS() {
+echo -e "${GREEN}${BOLD}# SUCCESS.. ${RESET}"
+sleep 0.4
+}
+
+MSG_EXITING() {
+echo -e "${RED}${BOLD}# EXITING.. GOODBYE.. ${RESET}"
+sleep 0.4
+}
+# END OF SYSTEM MESSAGES
+
+# DEPENDENCIES
+DEP_CHECK() {
+if ! dpkg -l rsync 2> /dev/null | awk '{print $1}' | grep -iq "^ii\\|^hi\\|^i"; then
+  header_red
+  echo -e "${RED}#${RESET} Rsync is required but not installed on your system!"
+  read -rp $'# Do you want to install it? (Y/n) ' yes_no;
+  case "$yes_no" in
+      [Yy]*|"")echo -e "${YELLOW}Ok.. Please wait.. ${BLINK}Installing..${RESET}" && pkexec apt update &> /dev/null && pkexec apt install rsync -y &> /dev/null;;
+      [Nn]*) exit 0;;
+  esac
+fi
+
+if ! dpkg -l zenity 2> /dev/null | awk '{print $1}' | grep -iq "^ii\\|^hi\\|^i"; then
+  header_red
+  echo -e "${RED}#${RESET} Zenity is required but not installed on your system!"
+  read -rp $'# Do you want to install it? (Y/n) ' yes_no;
+  case "$yes_no" in
+      [Yy]*|"")echo -e "${YELLOW}Ok.. Please wait.. ${BLINK}Installing..${RESET}" && pkexec apt update &> /dev/null && pkexec apt install zenity -y &> /dev/null;;
+      [Nn]*) exit 0;;
+  esac
+fi
+
+if ! which scp &> /dev/null; then
+  header_red
+  echo -e "${RED}#${RESET} Scp is required but not installed on your system!"
+  read -rp $'# Do you want to install it? (Y/n) ' yes_no;
+  case "$yes_no" in
+      [Yy]*|"")echo -e "${YELLOW}Ok.. Please wait.. ${BLINK}Installing..${RESET}" && pkexec apt update &> /dev/null && pkexec apt install openssh-client -y &> /dev/null;;
+      [Nn]*) exit 0;;
+  esac
+fi
+}
+
+DEP_CHECK_CURL() {
+if ! which curl &> /dev/null; then
+  header_red
+  echo -e "${RED}#${RESET} Curl is required but not installed on your system!"
+  read -rp $'# Do you want to install it? (Y/n) ' yes_no;
+  case "$yes_no" in
+      [Yy]*|"")echo -e "${YELLOW}Ok.. Please wait.. ${BLINK}Installing..${RESET}" && sudo apt update &> /dev/null && sudo apt install curl -y &> /dev/null;;
+      [Nn]*) exit 0;;
+  esac
+fi
+}
+
+DEP_CHECK_OLD() {
+if ! which sshpass &> /dev/null; then
+  header_red
+  echo -e "${RED}#${RESET} SSHPASS is required but not installed on your system!"
+  read -rp $'# Do you want to install it? (Y/n) ' yes_no;
+  case "$yes_no" in
+      [Yy]*|"")echo -e "${YELLOW}Ok.. Please wait.. ${BLINK}Installing..${RESET}" && pkexec apt update &> /dev/null && pkexec apt install sshpass -y &> /dev/null;;
+      [Nn]*) exit 0;;
+  esac
+fi
+}
+# END OF DEPENDENCIES
+
+# DEPENDENCIES ON A REMOTE SERVER
+DEP_REMOTE() {
+ssh "$RHOST" 'sudo apt install rsync unzip -y &> /dev/null'
+}
+
+DEP_REMOTE_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'sudo apt install rsync unzip -y &> /dev/null'
+}
+# END OF DEPENDENCIES ON A REMORE SERVER
+
+# USER INPUT
+ASK_RHOST() {
+read -r -e -p "Enter Remote Location: " RHOST
+}
+
+ASK_RHOST_2() {
+read -r -e -p "Enter Remote Location (ex: user@server): " RHOST2
+}
+
+ASK_RHOST_PASS() {
+read -r -e -p "Enter SSH Password: " SRV_PASS
+}
+
+ASK_FILE() {
+FPATH="$(zenity --file-selection --title='Select a File' 2> /dev/null)"
+}
+
+# END OF USER INPUT
+
+# FILES OPERATIONS
+RUN_COPYING() {
+scp "$FPATH" "$RHOST":/home/ubuntu/
+}
+
+RUN_COPYING_2() {
+sshpass -p $SRV_PASS scp $FPATH $RHOST2:/tmp/
+}
+
+RUN_EXTRACT() {
+ssh "$RHOST" 'cd /home/ubuntu/ && unzip -qq *.zip' &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+}
+
+RUN_EXTRACT_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'cd /tmp/ && unzip -qq *.zip' &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+}
+
+RUN_REMOVEOLD() {
+ssh "$RHOST" 'HDTSWAR=$(sudo find /var /opt -iname "hdts.war"); HDTSTESTER=$(sudo find /var /opt -iname "HDTSTester*"); sudo rm $HDTSWAR &> /dev/null; sudo rm $HDTSTESTER &> /dev/null'
+}
+
+RUN_REMOVEOLD_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'HDTSWAR=$(sudo find /var /opt -iname "hdts.war"); HDTSTESTER=$(sudo find /var /opt -iname "HDTSTester*"); sudo rm $HDTSWAR &> /dev/null; sudo rm $HDTSTESTER &> /dev/null'
+}
+
+RUN_RSYNCNEW() {
+ssh "$RHOST" 'ZIP_FILENAME=$(basename -s .zip build_beeSPORT_*.zip); sudo rsync -r /home/ubuntu/$ZIP_FILENAME/tester/ /var/lib/tomcat9/webapps/tester/; sudo rsync -r /home/ubuntu/$ZIP_FILENAME/script_db_migration/ /var/lib/tomcat9/webapps/script_db_migration/; sudo rsync -r /home/ubuntu/$ZIP_FILENAME/videos/ /var/lib/tomcat9/webapps/videos/; sudo cp /home/ubuntu/$ZIP_FILENAME/hdts.war /var/lib/tomcat9/webapps/'
+}
+
+RUN_RSYNCNEW_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'ZIP_FILENAME=$(basename -s .zip build_beeSPORT_*.zip); sudo rsync -r /tmp/$ZIP_FILENAME/tester/ /opt/tomcat/webapps/tester/; sudo rsync -r /tmp/$ZIP_FILENAME/script_db_migration/ /opt/tomcat/webapps/script_db_migration/; sudo rsync -r /tmp/$ZIP_FILENAME/videos/ /opt/tomcat/webapps/videos/; sudo cp /tmp/$ZIP_FILENAME/hdts.war /opt/tomcat/webapps/'
+}
+
+RUN_CHOWN() {
+ssh "$RHOST" 'sudo chown -R tomcat:tomcat /var/lib/tomcat9/webapps/'
+}
+
+RUN_CHOWN_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'sudo chown -R tomcat:tomcat /opt/tomcat/webapps/'
+}
+
+RUN_REQUIRED() {
+ssh "$RHOST" 'cd /var/lib/tomcat9/webapps/tester/ && sudo bash updateFilesVersion.sh &> /dev/null'
+}
+
+RUN_REQUIRED_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'cd /opt/tomcat/webapps/tester/ && sudo bash updateFilesVersion.sh &> /dev/null'
+}
+# END OF FILES OPERATIONS
+
+# END
+RUN_RESTART() {
+ssh "$RHOST" 'sudo service tomcat9 restart'
+}
+
+RUN_RESTART_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 '/opt/tomcat/bin/shutdown.sh ; sleep 5 ; /opt/tomcat/bin/startup.sh'
+}
+
+RUN_CLEANING() {
+ssh "$RHOST" 'cd /home/ubuntu/; ZIP_FILENAME=$(basename -s .zip build_beeSPORT_*.zip); rm $ZIP_FILENAME.zip; rm -r $ZIP_FILENAME'
+}
+
+RUN_CLEANING_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'cd /tmp/; ZIP_FILENAME=$(basename -s .zip build_beeSPORT_*.zip); rm $ZIP_FILENAME.zip; rm -r $ZIP_FILENAME'
+}
+
+SHOW_DETAILS() {
+ssh "$RHOST" 'echo -e "${BOLD}Verify BeeSport Version:${RESET}" && echo; sudo cat /var/lib/tomcat9/webapps/hdts/META-INF/MANIFEST.MF | grep "Implementation-Version:" && echo "-----------------------------"; echo'
+ssh "$RHOST" 'echo -e "${BOLD}Verify file HDTSTester has correct version number${RESET}" && echo; ls /var/lib/tomcat9/webapps/tester/files/lib/HDTSTester*'
+}
+
+SHOW_DETAILS_2() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'echo -e "${BOLD}Verify BeeSport Version:${RESET}" && echo; sudo cat /opt/tomcat/webapps/hdts/META-INF/MANIFEST.MF | grep "Implementation-Version:" && echo "-----------------------------"; echo'
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'echo -e "${BOLD}Verify file HDTSTester has correct version number${RESET}" && echo; ls /opt/tomcat/webapps/tester/files/lib/HDTSTester*'
+}
+
+RUN_RESTART_SYS() {
+sshpass -p $SRV_PASS ssh $OPT $RHOST2 'sudo reboot'
+}
+# END OF THE END
+
+#################################################################################################
+#                                                                                               #
+#                                        <UPGRADE BEESPORT AWS>                                 #
+#                                                                                               #
+#################################################################################################
+
+# SPLASH SCREEN & DEPENDENCY CHECK
+UPGRADE_BEESPORT1() {
+echo
+header_call
+sleep 3 &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo
+sleep 0.3
+echo -e "${YELLOW}# CHECKING DEPENDENCIES .. ${RESET}"
+sleep 2
+ DEP_CHECK
+echo
+echo -e "${GREEN}${BOLD}# All good! Script has been loaded.${RESET}"
+read -n 1 -s -r -p "# Press any key to continue"
+# END OF SPLASH SCREEN & DEPENDENCY CHECK
+
+# SPECIFY REMOTE SERVER
+ header_green
+echo -e "${YELLOW}# SPECIFY REMOTE SERVER # ${RESET}"
+ ASK_RHOST
+  if [ "$RHOST" = "hdcczech" ]; then
+     header_red
+     MSG_HDCCZECH
+     sleep 3
+  fi
+echo
+sleep 1
+ header_green
+echo -e "${BOLD}${YELLOW}# INSTALLING REQUIRED TOOLS ON A REMOTE HOST${RESET}"
+ DEP_REMOTE
+echo
+ MSG_SUCCESS
+echo -e "${GREEN}${BOLD}# ALL GOOD.. SCRIPT WILL NOW CONTINUE${RESET}"
+sleep 1
+# END OF SPECIFY REMOTE SERVER
+
+# SPECIFY UPDATE FILE
+ header_green
+echo -e "${YELLOW}# SUPPLY AN UPDATE FILE # ${RESET}"
+
+    while true; do
+        read -r -p "# Would you like to select an update file? (.zip only!) [y/n]: " yn
+        case $yn in
+            [Yy]* ) ASK_FILE; break;;
+            [Nn]* ) header_red; MSG_EXITING; exit;;
+                * ) header_red; echo -e "${RED}${BOLD}# You rebel.. Exiting..${RESET}"; exit;;
+        esac
+    done
+sleep 0.5
+ MSG_SUCCESS
+echo -e "# Path is:${RED} '$FPATH' ${RESET}"
+echo
+echo
+# END OF SPECIFY UPDATE FILE
+
+# RUN SCP
+ header_green
+echo -e "${YELLOW}# COPYING FILES TO A REMOTE SERVER # ${RESET}"
+ RUN_COPYING
+    if [ $? -eq 0 ]; then
+        echo
+        MSG_SUCCESS
+    else
+        header_red
+        echo -e "# COPYING HAS FAILED"
+        MSG_EXITING
+        exit 0
+    fi
+sleep 0.3
+# END OF RUN SCP
+
+# UNZIP FILES
+ header_green
+echo -e "${YELLOW}# EXTRACTING FILES # ${RESET}"
+ RUN_EXTRACT
+    if [ $? -eq 0 ]; then
+        echo
+        MSG_SUCCESS
+    else
+        header_red
+        echo -e "# EXTRACTING HAS FAILED"
+        MSG_EXITING
+        exit 0
+    fi
+# END OF UNZIP FILES
+
+# UNDEPLOY REMOVE OLD FILES
+ header_green
+echo -e "${YELLOW}# UNDEPLOYING TOMCAT APPLICATION # ${RESET}"
+ RUN_REMOVEOLD
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo
+ MSG_SUCCESS
+# END OF UNDEPLOY REMOVE OLD FILES
+
+# RSYNC NEW FILES
+ header_green
+echo -e "${YELLOW}# COPYING NEW FILES # ${RESET}"
+ RUN_RSYNCNEW &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo
+ MSG_SUCCESS
+# END OF RSYNC NEW FILES
+
+# CHOWN CHANGE
+ header_green
+echo -e "${YELLOW}# CHANGING OWNERSHIP OF /WEBAPPS/ # ${RESET}"
+RUN_CHOWN
+    if [ $? -eq 0 ]; then
+        echo
+        MSG_SUCCESS
+    else
+        header_red
+        echo -e "# CHANGING OWNERSHIP HAS FAILED"
+        MSG_EXITING
+        exit 0
+    fi
+# END OF CHOWN CHANGE
+
+# RUN REQUIRED SCRIPT
+header_CYAN
+echo -e "${YELLOW}# THE updateFilesVersion.sh IS REQUIRED TO RUN # ${RESET}"
+while true; do
+    read -r -p "# Do you want to run it now? [y/n]: " yn
+    case $yn in
+        [Yy]* ) header_green; RUN_REQUIRED; MSG_SUCCESS; break;;
+        [Nn]* ) exit;;
+            * ) echo "You are a pussy";;
+    esac
+done
+# END OF RUN REQUIRED SCRIPT
+
+# TOMCAT SERVER RESTART
+echo -e "${YELLOW}# RESTARTING TOMCAT SERVER # ${RESET}"
+ RUN_RESTART &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+ MSG_SUCCESS
+# END OF TOMCAT SERVER RESTART
+
+# CLEANING UP
+ header_green
+echo -e "${YELLOW}# CLEANING UP # ${RESET}"
+ RUN_CLEANING &
+  PID=$!
+  i=1
+  sp="/-\|"
+  echo -n ' '
+  while [ -d /proc/$PID ]
+  do
+    printf "\b${sp:i++%${#sp}:1}"
+  done
+echo
+MSG_SUCCESS
+# END OF CLEANING UP
+
+# VERSION PRINT
+sleep 2 &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo -e "${GREEN}${BOLD}# ALL TASKS COMPLETED SUCCESSFULLY # ${RESET}"
+echo
+echo
+ SHOW_DETAILS
+echo
+echo -e "${GREEN}${BOLD}# Have a good day ${RESET}"
+echo
+echo
+ANY_KEY
+# END OF VERSION PRINT
+}
+
+#################################################################################################
+#                                                                                               #
+#                                        <UPGRADE BEESPORT OLD>                                 #
+#                                                                                               #
+#################################################################################################
+
+# SPLASH SCREEN & DEPENDENCY CHECK
+UPGRADE_BEESPORT2() {
+echo
+header_call
+sleep 3 &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo
+sleep 0.3
+echo -e "${YELLOW}# CHECKING DEPENDENCIES .. ${RESET}"
+sleep 2
+ DEP_CHECK
+ DEP_CHECK_OLD
+echo
+echo -e "${GREEN}${BOLD}# All good! Script has been loaded.${RESET}"
+read -n 1 -s -r -p "# Press any key to continue"
+# END OF SPLASH SCREEN & DEPENDENCY CHECK
+
+# SPECIFY REMOTE SERVER
+ header_green
+echo -e "${YELLOW}# SPECIFY REMOTE SERVER # ${RESET}"
+ ASK_RHOST_2
+  if [ "$RHOST2" = "hdcczech" ]; then
+     header_red
+     MSG_HDCCZECH
+     sleep 3
+  fi
+echo
+sleep 1
+ header_green
+ ASK_RHOST_PASS
+ header_green
+echo -e "${BOLD}${YELLOW}# INSTALLING REQUIRED TOOLS ON A REMOTE HOST${RESET}"
+ DEP_REMOTE_2
+echo
+ MSG_SUCCESS
+echo -e "${GREEN}${BOLD}# ALL GOOD.. SCRIPT WILL NOW CONTINUE${RESET}"
+sleep 1
+# END OF SPECIFY REMOTE SERVER
+
+# SPECIFY UPDATE FILE
+ header_green
+echo -e "${YELLOW}# SUPPLY AN UPDATE FILE # ${RESET}"
+
+    while true; do
+        read -r -p "# Would you like to select an update file? (.zip only!) [y/n]: " yn
+        case $yn in
+            [Yy]* ) ASK_FILE; break;;
+            [Nn]* ) header_red; MSG_EXITING; exit;;
+                * ) header_red; echo -e "${RED}${BOLD}# You rebel.. Exiting..${RESET}"; exit;;
+        esac
+    done
+sleep 0.5
+ MSG_SUCCESS
+echo -e "# Path is:${RED} '$FPATH' ${RESET}"
+sleep 2
+echo
+echo
+# END OF SPECIFY UPDATE FILE
+
+# RUN SCP
+ header_green
+echo -e "${YELLOW}# COPYING FILES TO A REMOTE SERVER # ${RESET}"
+ RUN_COPYING_2
+    if [ $? -eq 0 ]; then
+        echo
+        MSG_SUCCESS
+    else
+        header_red
+        echo -e "# COPYING HAS FAILED"
+        MSG_EXITING
+        exit 0
+    fi
+sleep 0.3
+# END OF RUN SCP
+
+# UNZIP FILES
+ header_green
+echo -e "${YELLOW}# EXTRACTING FILES # ${RESET}"
+ RUN_EXTRACT_2
+    if [ $? -eq 0 ]; then
+        echo
+        MSG_SUCCESS
+    else
+        header_red
+        echo -e "# EXTRACTING HAS FAILED"
+        MSG_EXITING
+        exit 0
+    fi
+# END OF UNZIP FILES
+
+# UNDEPLOY REMOVE OLD FILES
+ header_green
+echo -e "${YELLOW}# UNDEPLOYING TOMCAT APPLICATION # ${RESET}"
+ RUN_REMOVEOLD_2
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo
+ MSG_SUCCESS
+# END OF UNDEPLOY REMOVE OLD FILES
+
+# RSYNC NEW FILES
+ header_green
+echo -e "${YELLOW}# COPYING NEW FILES # ${RESET}"
+ RUN_RSYNCNEW_2 &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo
+ MSG_SUCCESS
+# END OF RSYNC NEW FILES
+
+# CHOWN CHANGE
+ header_green
+echo -e "${YELLOW}# CHANGING OWNERSHIP OF /WEBAPPS/ # ${RESET}"
+RUN_CHOWN_2
+    if [ $? -eq 0 ]; then
+        echo
+        MSG_SUCCESS
+    else
+        header_red
+        echo -e "# CHANGING OWNERSHIP HAS FAILED"
+        MSG_EXITING
+        exit 0
+    fi
+# END OF CHOWN CHANGE
+
+# RUN REQUIRED SCRIPT
+header_CYAN
+echo -e "${YELLOW}# THE updateFilesVersion.sh IS REQUIRED TO RUN # ${RESET}"
+while true; do
+    read -r -p "# Do you want to run it now? [y/n]: " yn
+    case $yn in
+        [Yy]* ) header_green; RUN_REQUIRED_2; MSG_SUCCESS; break;;
+        [Nn]* ) exit;;
+            * ) echo "You are a pussy";;
+    esac
+done
+# END OF RUN REQUIRED SCRIPT
+
+# TOMCAT SERVER RESTART
+echo -e "${YELLOW}# RESTARTING TOMCAT SERVER # ${RESET}"
+ RUN_RESTART_2 &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+ MSG_SUCCESS
+# END OF TOMCAT SERVER RESTART
+
+# CLEANING UP
+ header_green
+echo -e "${YELLOW}# CLEANING UP # ${RESET}"
+ RUN_CLEANING_2 &
+  PID=$!
+  i=1
+  sp="/-\|"
+  echo -n ' '
+  while [ -d /proc/$PID ]
+  do
+    printf "\b${sp:i++%${#sp}:1}"
+  done
+echo
+MSG_SUCCESS
+# END OF CLEANING UP
+
+# VERSION PRINT
+sleep 2 &
+PID=$!
+i=1
+sp="/-\|"
+echo -n ' '
+while [ -d /proc/$PID ]
+do
+  printf "\b${sp:i++%${#sp}:1}"
+done
+echo -e "${GREEN}${BOLD}# ALL TASKS COMPLETED SUCCESSFULLY # ${RESET}"
+echo
+echo
+ SHOW_DETAILS_2
+echo
+echo -e "${GREEN}${BOLD}# Have a good day ${RESET}"
+echo
+echo
+ANY_KEY_2
+RUN_RESTART_SYS
+
+# END OF VERSION PRINT
+}
+
+#################################################################################################
+#                                                                                               #
+#                                        <CHECK AWS SERVERS>                                    #
+#                                                                                               #
+#################################################################################################
+
+AWS_CHECK() {
+header_http
+  sleep 2 &
+  PID=$!
+  i=1
+  sp="/-\|"
+    echo -n ' '
+    while [ -d /proc/$PID ]
+    do
+      printf "\b${sp:i++%${#sp}:1}"
+    done
+clear
+DEP_CHECK_CURL
+echo
+echo -e "${GREEN}# BEESPORT AWS SERVERS AVAILABILITY CHECK ${RESET}" | pv -qL $((60+(-2 + RANDOM%5)))
+#
+#
+conf=/home/user/Desktop/bin/servers.conf
+while IFS= read -r srv; do
+if  [[ $srv == -* ]]  ;
+then
+srv=${srv:1}
+curl --connect-timeout 3 --max-time 10 -Is "$srv" | head -1 && echo -e "\e[37m$srv\e[0m"
+fi
+done < "$conf"
+ANY_KEY
+}
+#################################################################################################
+#                                                                                               #
+#                                        <CHECK OLD SERVERS>                                    #
+#                                                                                               #
+#################################################################################################
+
+OLD_CHECK() {
+header_http
+  sleep 2 &
+  PID=$!
+  i=1
+  sp="/-\|"
+    echo -n ' '
+    while [ -d /proc/$PID ]
+    do
+      printf "\b${sp:i++%${#sp}:1}"
+    done
+clear
+DEP_CHECK_CURL
+echo
+echo -e "${GREEN}# BEESPORT INTERNAL SERVERS AVAILABILITY CHECK ${RESET}" | pv -qL $((60+(-2 + RANDOM%5)))
+#
+#
+conf=/home/user/Desktop/bin/servers.conf
+while IFS= read -r srv; do
+if  [[ $srv == _* ]]  ;
+then
+srv=${srv:1}
+curl --connect-timeout 3 --max-time 10 -Is "$srv" | head -1 && echo -e "\e[37m$srv\e[0m"
+fi
+done < "$conf"
+ANY_KEY
+}
+
+#################################################################################################
+#                                                                                               #
+#                                        <CHECK ALL SERVERS>                                    #
+#                                                                                               #
+#################################################################################################
+
+ALL_CHECK() {
+header_http
+  sleep 2 &
+  PID=$!
+  i=1
+  sp="/-\|"
+    echo -n ' '
+    while [ -d /proc/$PID ]
+    do
+      printf "\b${sp:i++%${#sp}:1}"
+    done
+clear
+DEP_CHECK_CURL
+echo
+echo -e "${GREEN}# ALL SERVERS AVAILABILITY CHECK ${RESET}" | pv -qL $((60+(-2 + RANDOM%5)))
+#
+#
+echo
+echo "# AWS SERVERS"
+conf=/home/user/Desktop/bin/servers.conf
+while IFS= read -r srv; do
+if  [[ $srv == -* ]]  ;
+then
+srv=${srv:1}
+curl --connect-timeout 3 --max-time 10 -Is "$srv" | head -1 && echo -e "\e[37m$srv\e[0m"
+fi
+done < "$conf"
+echo
+echo "LOCAL SERVERS"
+conf=/home/user/Desktop/bin/servers.conf
+while IFS= read -r srv; do
+if  [[ $srv == _* ]]  ;
+then
+srv=${srv:1}
+curl --connect-timeout 3 --max-time 10 -Is "$srv" | head -1 && echo -e "\e[37m$srv\e[0m"
+fi
+done < "$conf"
+ANY_KEY
+}
+
+# MENU
+MENU(){
+LOADER
+clear
+echo -ne "
+${BOLD}Welcome to BeeSport Manager v.$VERSION${RESET}
+$(ColorGreen '1)') ${YELLOW}BeeSport Upgrade (AWS)${RESET}
+$(ColorGreen '2)') ${YELLOW}BeeSport Upgrade (OLD)${RESET}
+$(ColorGreen '3)') ${YELLOW}Server Availability Check${RESET}
+$(ColorGreen '4)') ${YELLOW}Restart BeeSport Server${RESET}
+$(ColorGreen '5)') Wipe Database
+$(ColorGreen '0)') Exit
+$(ColorBlue 'Choose an option:') "
+        read -r a
+        case $a in
+                1) LOADER ; UPGRADE_BEESPORT1 ; MENU ;;
+                2) LOADER ; UPGRADE_BEESPORT2 ; MENU ;;
+                3) SUB_MENU_3 ;;
+                4) SUB_MENU_4 ;;
+                5) LOADER ; WIPE_DATABASE ; MENU ;;
+                0) LOADER ; MSG_EXITING ; clear ; exit 0 ;;
+                *) LOADER ; header_red ; echo -e "${RED}${BOLD}# WRONG OPTION${RESET}"; sleep 2 ; MENU ;;
+        esac
+}
+
+SUB_MENU_3(){
+LOADER
+clear
+echo -ne "
+${BOLD}Server Availability Check${RESET}
+$(ColorGreen '1)') ${YELLOW}Check AWS Servers${RESET}
+$(ColorGreen '2)') ${YELLOW}Check Internal Servers${RESET}
+$(ColorGreen '3)') ${YELLOW}Check All Servers${RESET}
+$(ColorGreen '9)') Back to main menu
+$(ColorBlue 'Choose an option:') "
+        read -r a
+        case $a in
+                1) LOADER ; AWS_CHECK ; MENU ;;
+                2) LOADER ; OLD_CHECK ; MENU ;;
+                3) LOADER ; ALL_CHECK ; MENU ;;
+                9) MENU ;;
+                *) LOADER ; header_red ; echo -e "${RED}${BOLD}# WRONG OPTION${RESET}"; sleep 2 ; MENU ;;
+        esac
+}
+
+SUB_MENU_4(){
+LOADER
+clear
+echo -ne "
+${BOLD}BeeSport Server Restart${RESET}
+$(ColorGreen '1)') ${YELLOW}AWS Server${RESET}
+$(ColorGreen '2)') ${YELLOW}Local Server${RESET}
+$(ColorGreen '9)') Back to main menu
+$(ColorBlue 'Choose an option:') "
+        read -r a
+        case $a in
+                1) LOADER ; AWS_REBOOT ; MENU ;;
+                2) LOADER ; OLD_REBOOT ; MENU ;;
+                9) MENU ;;
+                *) LOADER ; header_red ; echo -e "${RED}${BOLD}# WRONG OPTION${RESET}"; sleep 2 ; MENU ;;
+        esac
+}
+
+AWS_REBOOT(){
+LOADER
+clear
+echo -ne "
+${BOLD}Select Server For Restart${RESET}
+$(ColorGreen '1)') ${YELLOW}ubuntu.beesport.online${RESET}
+$(ColorGreen '2)') ${YELLOW}hc05bb.beesport.online${RESET}
+$(ColorGreen '3)') ${YELLOW}salekhard.beesport.online${RESET}
+$(ColorGreen '4)') ${YELLOW}hdcczech.beesport.online${RESET}
+$(ColorGreen '5)') ${YELLOW}hcavangard.beesport.online${RESET}
+$(ColorGreen '6)') ${YELLOW}4dhockey.beesport.online${RESET}
+$(ColorGreen '7)') ${YELLOW}sachalin.beesport.online${RESET}
+$(ColorGreen '8)') ${YELLOW}fhctrutnov.beesport.online${RESET}
+$(ColorGreen '9)') ${YELLOW}orebrosdc.beesport.online${RESET}
+$(ColorGreen '10)') ${YELLOW}hclokomotivschool.beesport.online${RESET}
+$(ColorGreen '11)') ${YELLOW}khantym.beesport.online${RESET}
+$(ColorGreen '0)') Back to main menu
+$(ColorBlue 'Choose an option:') "
+        read -r a
+        case $a in
+                1) LOADER ; BEESPORT_REBOOT1 ; MENU ;;
+                2) LOADER ; OLD_REBOOT ; MENU ;;
+                9) MENU ;;
+                *) LOADER ; header_red ; echo -e "${RED}${BOLD}# WRONG OPTION${RESET}"; sleep 2 ; MENU ;;
+        esac
+}
+
+OLD_REBOOT(){
+LOADER
+clear
+echo -ne "
+${BOLD}BeeSport Server Restart${RESET}
+$(ColorGreen '1)') ${YELLOW}AWS Server${RESET}
+$(ColorGreen '2)') ${YELLOW}Local Server${RESET}
+$(ColorGreen '9)') Back to main menu
+$(ColorBlue 'Choose an option:') "
+        read -r a
+        case $a in
+                1) LOADER ; AWS_REBOOT ; MENU ;;
+                2) LOADER ; OLD_REBOOT ; MENU ;;
+                9) MENU ;;
+                *) LOADER ; header_red ; echo -e "${RED}${BOLD}# WRONG OPTION${RESET}"; sleep 2 ; MENU ;;
+        esac
+}
+
+# Call the menu
+clear
+MENU
